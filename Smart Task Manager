@@ -1,1 +1,237 @@
+studyflow-task-manager/
+│
+├── server/
+│   ├── server.js
+│   ├── routes/
+│   │   └── tasks.js
+│   ├── data/
+│   │   └── tasks.json
+│
+├── public/
+│   ├── index.html
+│   ├── style.css
+│   ├── script.js
+│
+├── docs/
+│   └── documentation.txt
+│
+├── package.json
+├── README.md
+└── .gitignore
 
+
+{
+  "name": "studyflow-task-manager",
+  "version": "1.0.0",
+  "description": "Task manager for students",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2"
+  }
+}
+
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+
+const taskRoutes = require('./routes/tasks');
+
+const app = express();
+const PORT = 3000;
+
+app.use(cors());
+app.use(bodyParser.json());
+app.use(express.static('public'));
+
+app.use('/api/tasks', taskRoutes);
+
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+});
+
+
+const express = require('express');
+const fs = require('fs');
+const router = express.Router();
+
+const filePath = './server/data/tasks.json';
+
+// GET tasks
+router.get('/', (req, res) => {
+    const data = JSON.parse(fs.readFileSync(filePath));
+    res.json(data);
+});
+
+// ADD task
+router.post('/', (req, res) => {
+    const data = JSON.parse(fs.readFileSync(filePath));
+    const newTask = {
+        id: Date.now(),
+        title: req.body.title,
+        completed: false
+    };
+    data.push(newTask);
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+    res.json(newTask);
+});
+
+// DELETE task
+router.delete('/:id', (req, res) => {
+    let data = JSON.parse(fs.readFileSync(filePath));
+    data = data.filter(task => task.id != req.params.id);
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+    res.json({ message: 'Deleted' });
+});
+
+// TOGGLE complete
+router.put('/:id', (req, res) => {
+    let data = JSON.parse(fs.readFileSync(filePath));
+    data = data.map(task => {
+        if (task.id == req.params.id) {
+            task.completed = !task.completed;
+        }
+        return task;
+    });
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+    res.json({ message: 'Updated' });
+});
+
+module.exports = router;
+[]
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>StudyFlow</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>📚 StudyFlow Task Manager</h1>
+
+    <input type="text" id="taskInput" placeholder="New task...">
+    <button onclick="addTask()">Add</button>
+
+    <ul id="taskList"></ul>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+body {
+    font-family: Arial;
+    text-align: center;
+    background: #f5f5f5;
+}
+
+h1 {
+    color: #333;
+}
+
+input {
+    padding: 10px;
+    width: 200px;
+}
+
+button {
+    padding: 10px;
+    margin-left: 5px;
+}
+
+li {
+    list-style: none;
+    margin: 10px;
+    padding: 10px;
+    background: white;
+}
+
+.completed {
+    text-decoration: line-through;
+    color: gray;
+}
+
+const API = '/api/tasks';
+
+async function loadTasks() {
+    const res = await fetch(API);
+    const tasks = await res.json();
+
+    const list = document.getElementById('taskList');
+    list.innerHTML = '';
+
+    tasks.forEach(task => {
+        const li = document.createElement('li');
+        li.textContent = task.title;
+
+        if (task.completed) {
+            li.classList.add('completed');
+        }
+
+        li.onclick = () => toggleTask(task.id);
+
+        const del = document.createElement('button');
+        del.textContent = 'X';
+        del.onclick = (e) => {
+            e.stopPropagation();
+            deleteTask(task.id);
+        };
+
+        li.appendChild(del);
+        list.appendChild(li);
+    });
+}
+
+async function addTask() {
+    const input = document.getElementById('taskInput');
+
+    await fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: input.value })
+    });
+
+    input.value = '';
+    loadTasks();
+}
+
+async function deleteTask(id) {
+    await fetch(`${API}/${id}`, { method: 'DELETE' });
+    loadTasks();
+}
+
+async function toggleTask(id) {
+    await fetch(`${API}/${id}`, { method: 'PUT' });
+    loadTasks();
+}
+
+loadTasks();
+
+
+# StudyFlow Task Manager
+
+## Description
+StudyFlow is a simple web-based task manager designed for students to organize their assignments and improve productivity.
+
+## Problem
+Students often struggle with managing deadlines and tracking tasks efficiently.
+
+## Features
+- Add tasks
+- Mark tasks as completed
+- Delete tasks
+- Persistent storage
+
+## Technologies
+- HTML, CSS, JavaScript
+- Node.js
+- Express
+
+## Installation
+
+```bash
+npm install
+npm start
