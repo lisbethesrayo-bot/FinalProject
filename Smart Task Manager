@@ -111,7 +111,7 @@ module.exports = router;
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>📚 StudyFlow Task Manager</h1>
+    <h1> StudyFlow Task Manager</h1>
 
     <input type="text" id="taskInput" placeholder="New task...">
     <button onclick="addTask()">Add</button>
