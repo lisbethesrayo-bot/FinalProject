@@ -1,2 +1,33 @@
-# FinalProject
-Final course project repository containing the complete source code of the system. Includes implementation of the solution, reflecting code quality and system design.
+## How to Run
+
+1. Clone the repository:
+   git clone <your-repo-link>
+
+2. Navigate to the project folder:
+   cd studyflow-task-manager
+
+3. Install dependencies:
+   npm install
+
+4. Start the server:
+   npm start
+
+5. Open your browser and go to:
+   http://localhost:3000
+   ## Project Structure
+
+- server/ → Backend (Node.js + Express API)
+- public/ → Frontend (HTML, CSS, JavaScript)
+- data/ → JSON file for storing tasks
+- docs/ → Project documentation
+
+## API Endpoints
+
+- GET /api/tasks → Get all tasks
+- POST /api/tasks → Add new task
+- PUT /api/tasks/:id → Toggle task completion
+- DELETE /api/tasks/:id → Delete a task
+
+- ## Notes
+
+This project uses a JSON file for data persistence instead of a database, making it simple and easy to run locally.
